@@ -1,6 +1,7 @@
 package daljin.reminder.user;
 
 import daljin.reminder.user.domain.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,14 @@ import java.util.List;
 
 @Service()
 public class UserService {
+
+    public UserService(
+            @Value("${env.name}") String envName,
+            @Value("${app.name}") String appName,
+            EnvConfig envConfig
+    ) {
+        System.out.println(envConfig.getName());
+    }
 
     private final List<User> users = new ArrayList<>(List.of(
             User.builder()
