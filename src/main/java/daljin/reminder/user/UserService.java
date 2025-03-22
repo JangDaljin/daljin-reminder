@@ -1,74 +1,77 @@
 package daljin.reminder.user;
 
-import daljin.reminder.user.domain.User;
-import org.springframework.beans.factory.annotation.Value;
+import daljin.reminder.core.constant.UserStatus;
+import daljin.reminder.core.entity.UserEntity;
+import daljin.reminder.core.repository.UserRepository;
+import daljin.reminder.user.dto.GetByIdResponseDto;
+import daljin.reminder.user.dto.GetResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.List;
 
 @Service()
 public class UserService {
 
+
+    private final UserRepository userRepository;
+
     public UserService(
-            @Value("${env.name}") String envName,
-            @Value("${app.name}") String appName,
-            EnvConfig envConfig
+            UserRepository userRepository
     ) {
-        System.out.println(envConfig.getName());
+        this.userRepository = userRepository;
     }
 
-    private final List<User> users = new ArrayList<>(List.of(
-            User.builder()
-                    .id(1)
-                    .name("user_name_1")
-                    .age(2)
-                    .createdAt(new Date())
-                    .updatedAt(new Date())
-                    .build()
-    ));
-
-    public Pair<Integer, List<User>> page(int pageNo, int pageSize) {
-        List<User> pageUsers;
-        int startIndex = ((pageNo - 1) * pageSize);
-        if(startIndex > this.users.size() -1) {
-            pageUsers = new ArrayList<>();
-        } else {
-            int lastIndex = Math.min(startIndex + pageSize - 1 , this.users.size());
-            pageUsers = this.users.subList(startIndex, lastIndex);
-        }
-
-
-        return Pair.of(this.users.size(), pageUsers);
+    public GetResponseDto page(Pageable pageable) {
+        Page<UserEntity> page = this.userRepository.findByStatus(UserStatus.ENABLED, pageable);
+        System.out.println(pageable);
+        return new GetResponseDto(
+                page.getSize(),
+                page.get().map(user -> new GetResponseDto.User(
+                        user.getId(),
+                        user.getName(),
+                        user.getAge(),
+                        user.getCreatedAt().format(DateTimeFormatter.BASIC_ISO_DATE),
+                        user.getUpdatedAt().format(DateTimeFormatter.BASIC_ISO_DATE)
+                )).toList()
+        );
     }
 
-    public User getUser(int id) {
-        return this.users.stream().filter(u -> u.getId() == id).findFirst().orElseThrow();
+    public GetByIdResponseDto getUser(long id) {
+        UserEntity user = this.userRepository.findById((long) id).orElseThrow();
+        return new GetByIdResponseDto(
+                user.getId(),
+                user.getName(),
+                user.getAge(),
+                user.getCreatedAt().format(DateTimeFormatter.BASIC_ISO_DATE),
+                user.getUpdatedAt().format(DateTimeFormatter.BASIC_ISO_DATE)
+        );
     }
 
     public void create(String name, int age) {
-        int nextId = this.users.size() + 1;
-        this.users.add(User.builder()
-                .id(nextId)
-                .name("user_name_" + nextId)
-                .age(nextId + 1)
-                .createdAt(new Date())
-                .updatedAt(new Date())
-                .build());
+        UserEntity newUser = UserEntity.builder()
+                .status(UserStatus.ENABLED)
+                .name(name)
+                .age(age)
+                .build();
+        this.userRepository.save(newUser);
     }
 
 
-    public void update(int id, String name, int age) {
-        User user = this.users.stream().filter(u -> u.getId() == id).findFirst().orElseThrow();
-
-        user.setName(name);
-        user.setAge(age);
+    public void update(long id, String name, int age) {
+        UserEntity user = this.userRepository.findById(id).orElseThrow();
+        this.userRepository.save(user);
     }
 
-    public void delete(int id) {
-        this.users.removeIf(user -> user.getId() == id);
+    public void delete(long id) {
+        UserEntity user = this.userRepository.findById(id).orElseThrow();
+        user.setStatus(UserStatus.DELETED);
+
+        this.userRepository.save(user);
     }
 
 }

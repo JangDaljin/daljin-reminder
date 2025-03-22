@@ -1,31 +1,28 @@
 package daljin.reminder.user.dto;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
+@Getter
 public class GetResponseDto {
-    @NonNull
-    public Integer count;
-    @NonNull
-    public List<GetResponseDto.User> users;
+    Integer count;
+    List<GetResponseDto.User> users;
 
-    @RequiredArgsConstructor
+    @AllArgsConstructor
+    @Getter
     public static class User {
-        @NonNull
-        public Integer id;
+        Long id;
 
-        @NonNull
         String name;
-        @NonNull
-        public Integer age;
+        Integer age;
 
-        @NonNull
-        public String createdAt;
-        @NonNull
-        public String updatedAt;
+        String createdAt;
+        String updatedAt;
     }
 }

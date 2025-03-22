@@ -1,20 +1,16 @@
 package daljin.reminder.user.dto;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
+@Getter
 public class GetByIdResponseDto {
-    @NonNull
-    public Integer id;
+    Long id;
 
-    @NonNull
-    public String name;
-    @NonNull
-    public Integer age;
+    String name;
+    Integer age;
 
-    @NonNull
-    public String createdAt;
-    @NonNull
-    public String updatedAt;
+    String createdAt;
+    String updatedAt;
 }
