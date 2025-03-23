@@ -3,15 +3,13 @@ package daljin.reminder.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @AllArgsConstructor
 @Getter
 public class GetResponseDto {
-    Integer count;
+    long count;
     List<GetResponseDto.User> users;
 
     @AllArgsConstructor

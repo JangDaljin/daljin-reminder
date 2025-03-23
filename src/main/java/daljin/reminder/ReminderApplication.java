@@ -11,8 +11,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import java.util.Arrays;
 
 @SpringBootApplication
-@EnableJpaAuditing
-@ConfigurationPropertiesScan(basePackages = "daljin.reminder")
 public class ReminderApplication {
 
     public static void main(String[] args) {

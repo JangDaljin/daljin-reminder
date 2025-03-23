@@ -4,10 +4,10 @@ import daljin.reminder.core.constant.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tb_user")
+@Table(name = "TB_USER")
 public class UserEntity {
     //UNSIGNED INT
     @Id
@@ -23,7 +23,6 @@ public class UserEntity {
     Long id;
 
     @Column
-    @ColumnDefault("'ENABLED'")
     @Enumerated(EnumType.STRING)
     UserStatus status;
 
@@ -34,11 +33,12 @@ public class UserEntity {
     @Column(nullable = false)
     Integer age;
 
-    @Column(name = "created_at")
-    @CreatedDate
+    @Column(name = "created_at", nullable = false , updatable = false)
     LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
     LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user")
+    final List<PostEntity> posts = new ArrayList<>();
 }

@@ -6,11 +6,13 @@ import daljin.reminder.core.repository.UserRepository;
 import daljin.reminder.user.dto.GetByIdResponseDto;
 import daljin.reminder.user.dto.GetResponseDto;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -26,12 +28,16 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public GetResponseDto page(Pageable pageable) {
-        Page<UserEntity> page = this.userRepository.findByStatus(UserStatus.ENABLED, pageable);
-        System.out.println(pageable);
+    public GetResponseDto page(int pageNo, int pageSize) {
+        Page<UserEntity> page = this.userRepository.findByStatus(UserStatus.ENABLED, PageRequest.of(
+                pageNo - 1,
+                pageSize
+        ));
+
+
         return new GetResponseDto(
-                page.getSize(),
-                page.get().map(user -> new GetResponseDto.User(
+                page.getTotalElements(),
+                page.getContent().stream().map(user -> new GetResponseDto.User(
                         user.getId(),
                         user.getName(),
                         user.getAge(),
@@ -57,6 +63,8 @@ public class UserService {
                 .status(UserStatus.ENABLED)
                 .name(name)
                 .age(age)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
         this.userRepository.save(newUser);
     }
@@ -64,6 +72,9 @@ public class UserService {
 
     public void update(long id, String name, int age) {
         UserEntity user = this.userRepository.findById(id).orElseThrow();
+        user.setName(name);
+        user.setAge(age);
+        user.setUpdatedAt(LocalDateTime.now());
         this.userRepository.save(user);
     }
 
@@ -73,5 +84,4 @@ public class UserService {
 
         this.userRepository.save(user);
     }
-
 }

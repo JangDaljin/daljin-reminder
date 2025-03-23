@@ -22,10 +22,10 @@ public class UserController {
 
     @GetMapping
     public GetResponseDto get(
-            @PageableDefault(page = 1, size = 25, sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable
+            @RequestParam(defaultValue = "1" , required = false) int pageNo,
+            @RequestParam(defaultValue = "25", required = false) int pageSize
     ) {
-        return this.userService.page(pageable);
+        return this.userService.page(pageNo , pageSize);
     }
 
     @GetMapping("/{id}")
